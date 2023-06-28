@@ -4,13 +4,16 @@ function removeNewlinesAndTrim(input: string): string {
     return trimmed;
 }
 function replaceSuffixSecond(input: string): string {
-    return input.replace("<span class=\"suffix seconds\">s</span>", "s")
+    input = input.replace("<span class=\"suffix seconds\">s</span>", "s")
+    input = input.replace("<span class=\"suffix\"> lap</span>", " lap")
+    input = input.replace("<span class=\"suffix\"> laps</span>", " laps")
+    return input
 }
 function capitalizeString(input: string): string {
     return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
 }
 function extractCountryName(input: string): string {
-    if(!input) return ''
+    if (!input) return ''
     const countrySlug = input.split('/')[1];
     const countryWords = countrySlug.split('-');
     const countryName = countryWords
@@ -18,9 +21,47 @@ function extractCountryName(input: string): string {
         .join(' ');
     return countryName;
 }
+function setTableColumnFromEmptyModel(obj: any) {
+    const extractedColumn = Object.keys(obj).map((key) => ({
+        title: Helper.capitalizeString(key),
+        key,
+        dataIndex: key,
+    }));
+    localStorage.setItem("tableColumns", JSON.stringify(extractedColumn))
+    return extractedColumn
+
+}
+function subStringUrl(input: string) {
+    // Extract "apiType"
+    const inputSplit = input.split("/")
+    const apiType = inputSplit[4];
+    // Extract last filter
+    let lastFilter = inputSplit[5]
+    if (inputSplit.length > 6) {
+        lastFilter = `${lastFilter}/${inputSplit[6]}`
+    }
+    lastFilter = lastFilter.replace('.html', "")
+    return { apiType: apiType, lastFilter: lastFilter }
+}
+function customHeadingTrim(input: string, trimSpecificValue: string): string {
+    input = input.trim();
+    const pattern = new RegExp(`${trimSpecificValue}\\s+-`, 'g');
+    const trimmedStr = input.replace(pattern, `${trimSpecificValue}-`);
+    return trimmedStr
+}
+function convertToRealSponserImageUrl(input: string): string {
+    if (input) {
+        return `https://www.formula1.com/${input}`
+    }
+    return ""
+}
 export const Helper = {
     removeNewlinesAndTrim,
     replaceSuffixSecond,
     capitalizeString,
-    extractCountryName
+    extractCountryName,
+    setTableColumnFromEmptyModel,
+    subStringUrl,
+    customHeadingTrim,
+    convertToRealSponserImageUrl
 }

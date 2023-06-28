@@ -4,9 +4,10 @@ import { Select } from "antd";
 interface CustomAntDSelectionProps {
   options: SelectOption[];
   isSort?: Boolean;
-  handleOnChange: (value: string,name:string) => void;
-  name:string,
-  defaultValue:string,
+  handleOnChange: (value: string, name: string) => void;
+  name: string;
+  defaultValue: string;
+  value: string;
 }
 const CustomAntDSelection: React.FC<CustomAntDSelectionProps> = ({
   isSort = false,
@@ -14,14 +15,18 @@ const CustomAntDSelection: React.FC<CustomAntDSelectionProps> = ({
   name,
   defaultValue,
   handleOnChange,
+  value,
 }) => {
   return (
     <Select
       showSearch
-      style={{ width: 200 }}
+      size="large"
+      style={{ minWidth: "200px" }}
       placeholder="Search to Select"
       optionFilterProp="children"
-      filterOption={(input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase())}
+      filterOption={(input, option) =>
+        (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+      }
       filterSort={
         isSort
           ? (optionA, optionB) =>
@@ -32,8 +37,9 @@ const CustomAntDSelection: React.FC<CustomAntDSelectionProps> = ({
       }
       options={options}
       onChange={(value) => {
-        handleOnChange(value,name);
+        handleOnChange(value, name);
       }}
+      value={value}
       defaultValue={defaultValue}
     />
   );

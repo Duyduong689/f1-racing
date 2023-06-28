@@ -13,6 +13,7 @@ export interface Races {
         hideForMobile: string;
         hideForDesktop: string;
     };
+    car:string;
     laps: string;
     time: string;
 }
@@ -115,4 +116,11 @@ export interface DHLFastestLapAward {
     };
     car: string;
     time:string;
+}
+export interface Heading {
+    heading:string;
+    sponserImageUrl:string,
+    startDate: string;
+    fullDate: string;
+    circuitInfo : string;
 }

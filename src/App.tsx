@@ -1,36 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Space, Button, Select } from "antd";
+import { Layout, Space, Button, Table, Image } from "antd";
 import "./App.css";
 import { f1resultService } from "./services/f1result";
-import { SelectOption } from "./model/F1RacingModel";
+import { Heading, SelectOption } from "./model/F1RacingModel";
 import CustomAntDSelection from "./components/CustomAntDSelection";
-const { Header, Footer, Sider, Content } = Layout;
-const headerStyle: React.CSSProperties = {
-  textAlign: "center",
-  color: "#fff",
-  height: 64,
-  paddingInline: 50,
-  lineHeight: "64px",
-  backgroundColor: "#7dbcea",
-};
-const contentStyle: React.CSSProperties = {
-  textAlign: "center",
-  minHeight: 120,
-  lineHeight: "120px",
-  color: "#fff",
-  backgroundColor: "#108ee9",
-};
-const siderStyle: React.CSSProperties = {
-  textAlign: "center",
-  lineHeight: "120px",
-  color: "#fff",
-  backgroundColor: "#3ba0e9",
-};
-const footerStyle: React.CSSProperties = {
-  textAlign: "center",
-  color: "#fff",
-  backgroundColor: "#7dbcea",
-};
+import CustomAntDTable from "./components/CustomAntDTable";
+import {
+  headerStyle,
+  contentStyle,
+  footerStyle,
+  layoutStyle,
+} from "./AppStyle";
+const { Header, Footer, Content } = Layout;
 
 function App() {
   const [filterYear, setFilterYear] = useState<SelectOption[]>([]);
@@ -42,14 +23,18 @@ function App() {
   const [filterData, setFilterData] = useState({
     year: "2023",
     apiType: "races",
-    meeting: "",
+    meeting: "all",
     driverRef: "",
     teamKey: "",
     resultType: "",
   });
-  const { data, isLoading, isError, refetch } =
+  const [heading, setHeading] = useState<Heading>();
+  const [description, setDescription] = useState("");
+  const [tableColumns, setTableColumns] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  const { data, isLoading, refetch } =
     f1resultService.useGetF1Result(filterData);
-  function getFilterDataFromStorage(key: string) {
+  function getDataFromStorage(key: string) {
     const storedData = localStorage.getItem(key);
     let parsedData = [];
     if (storedData) {
@@ -60,10 +45,13 @@ function App() {
   const handleGetResult = (value: string, name: string) => {
     setFilterData((prev) => {
       if (name == "apiType") {
-        prev["driverRef"] = "";
-        prev["teamKey"] = "";
-        prev["meeting"] = "";
+        prev["driverRef"] = value == "drivers" ? "all" : "";
+        prev["teamKey"] = value == "team" ? "all" : "";
+        prev["meeting"] = value == "races" ? "all" : "";
         prev["resultType"] = "";
+      }
+      if (name == "meeting") {
+        prev["resultType"] = "race-result";
       }
       return {
         ...prev,
@@ -71,13 +59,57 @@ function App() {
       };
     });
   };
+  const handleTableChangeFilter = (value: any) => {
+    const { apiType, lastFilter } = value;
+    if (apiType == "drivers") {
+      setFilterData((prev) => {
+        prev["apiType"] = apiType;
+        prev["driverRef"] = lastFilter;
+        prev["teamKey"] = "";
+        prev["meeting"] = "";
+        prev["resultType"] = "";
+        return {
+          ...prev,
+        };
+      });
+    } else if (apiType == "team") {
+      setFilterData((prev) => {
+        prev["apiType"] = apiType;
+        prev["driverRef"] = "";
+        prev["teamKey"] = lastFilter;
+        prev["meeting"] = "";
+        prev["resultType"] = "";
+        return {
+          ...prev,
+        };
+      });
+    } else if (apiType == "races") {
+      setFilterData((prev) => {
+        prev["apiType"] = apiType;
+        prev["driverRef"] = "";
+        prev["teamKey"] = "";
+        prev["meeting"] = lastFilter;
+        prev["resultType"] = "race-result";
+        return {
+          ...prev,
+        };
+      });
+    }
+  };
   useEffect(() => {
-    setFilterYear(getFilterDataFromStorage("filteryear"));
-    setFilterApiType(getFilterDataFromStorage("filterapiType"));
-    setFilterMeeting(getFilterDataFromStorage("filtermeetingKey"));
-    setFilterDriverRef(getFilterDataFromStorage("filterdriverRef"));
-    setFilterTeamKey(getFilterDataFromStorage("filterteamKey"));
-    setFilterResultType(getFilterDataFromStorage("filterresultType"));
+    setFilterYear(getDataFromStorage("filteryear"));
+    setFilterApiType(getDataFromStorage("filterapiType"));
+    setFilterMeeting(getDataFromStorage("filtermeetingKey"));
+    setFilterDriverRef(getDataFromStorage("filterdriverRef"));
+    setFilterTeamKey(getDataFromStorage("filterteamKey"));
+    setFilterResultType(getDataFromStorage("filterresultType"));
+    setTableColumns(getDataFromStorage("tableColumns"));
+    setTableData(getDataFromStorage("tableData"));
+    const storedElementHTML = JSON.parse(
+      localStorage.getItem("description") ?? ""
+    );
+    setDescription(storedElementHTML);
+    setHeading(getDataFromStorage("heading"));
   }, [data]);
   useEffect(() => {
     refetch();
@@ -86,28 +118,38 @@ function App() {
     return <div>Loading...</div>;
   }
   return (
-    <Layout>
+    <Layout style={layoutStyle}>
       <Header style={headerStyle}>
-        <Space wrap>
+        <div className="logo">
+          <a href="/">
+            <img
+              height="35px"
+              src="https://www.formula1.com/etc/designs/fom-website/images/f1_logo.svg"
+            />
+          </a>
+        </div>
+        <Space wrap className="filter-wrap">
           <CustomAntDSelection
             options={filterYear}
             name="year"
             handleOnChange={handleGetResult}
             defaultValue={filterData.year}
+            value={filterData.year}
           />
           <CustomAntDSelection
             options={filterApiType}
             name="apiType"
             handleOnChange={handleGetResult}
             defaultValue={filterData.apiType}
+            value={filterData.apiType}
           />
           {filterMeeting && filterMeeting.length > 0 && (
             <CustomAntDSelection
               options={filterMeeting}
               name="meeting"
               handleOnChange={handleGetResult}
-              isSort={true}
               defaultValue={filterData.meeting}
+              value={filterData.meeting}
             />
           )}
           {filterTeamKey && filterTeamKey.length > 0 && (
@@ -116,6 +158,7 @@ function App() {
               name="teamKey"
               handleOnChange={handleGetResult}
               defaultValue={filterData.teamKey}
+              value={filterData.teamKey}
             />
           )}
           {filterDriverRef && filterDriverRef.length > 0 && (
@@ -124,6 +167,7 @@ function App() {
               name="driverRef"
               handleOnChange={handleGetResult}
               defaultValue={filterData.driverRef}
+              value={filterData.driverRef}
             />
           )}
           {filterResultType && filterResultType?.length > 0 && (
@@ -132,12 +176,48 @@ function App() {
               name="resultType"
               handleOnChange={handleGetResult}
               defaultValue={filterData.resultType}
+              value={filterData.resultType}
             />
           )}
         </Space>
       </Header>
-      <Content style={contentStyle}>Content</Content>
-      <Footer style={footerStyle}>Footer</Footer>
+      <Content style={contentStyle}>
+        <div className="title">
+          {heading && heading.heading && (
+            <h1 className="title-head">{heading.heading}</h1>
+          )}
+          {heading && heading.sponserImageUrl && (
+            <img width="200px" src={heading.sponserImageUrl} />
+          )}
+        </div>
+        <div className="date-info">
+          {heading && heading.startDate && heading.fullDate && (
+            <span>
+              {heading.startDate}
+              {"-"}
+              {heading.fullDate}
+            </span>
+          )}
+          {heading && heading.circuitInfo && (
+            <span style={{ fontWeight: "lighter" }}>{heading.circuitInfo}</span>
+          )}
+        </div>
+        {description && (
+          <div
+            className="description"
+            style={{ lineHeight: "24px", color: "white", fontSize: "18px" }}
+            dangerouslySetInnerHTML={{ __html: description }}
+          ></div>
+        )}
+        <CustomAntDTable
+          columns={tableColumns}
+          data={tableData}
+          handleChangeFilter={handleTableChangeFilter}
+        />
+      </Content>
+      <Footer style={footerStyle}>
+        © 2003-2023 Formula One World Championship Limited
+      </Footer>
     </Layout>
   );
 }

@@ -26,12 +26,12 @@ const useGetF1Result = (filterData: any) => {
             const htmlDoc = parser.parseFromString(data, 'text/html');
             //get filter data
             const selectionFiltersElement = htmlDoc.getElementsByClassName('resultsarchive-filter-form-select');
-            localStorage.setItem(`filterresultType`, JSON.stringify([]))
-            localStorage.setItem(`filterteamKey`, JSON.stringify([]))
-            localStorage.setItem(`filterdriverRef`, JSON.stringify([]))
-            localStorage.setItem(`filtermeetingKey`, JSON.stringify([]))
-            localStorage.setItem(`heading`, JSON.stringify(""))
-            localStorage.setItem(`description`, JSON.stringify(""))
+            sessionStorage.setItem(`filterresultType`, JSON.stringify([]))
+            sessionStorage.setItem(`filterteamKey`, JSON.stringify([]))
+            sessionStorage.setItem(`filterdriverRef`, JSON.stringify([]))
+            sessionStorage.setItem(`filtermeetingKey`, JSON.stringify([]))
+            sessionStorage.setItem(`heading`, JSON.stringify(""))
+            sessionStorage.setItem(`description`, JSON.stringify(""))
 
             Array.from(selectionFiltersElement).map(item => {
                 let selectItemListData: SelectOption[] = [];
@@ -48,10 +48,10 @@ const useGetF1Result = (filterData: any) => {
                     const updateSelectItemListData = [
                         { value: 'all', label: "All" }, ...selectItemListData
                     ]
-                    localStorage.setItem(`filter${item.getAttribute("name")}`, JSON.stringify(updateSelectItemListData))
+                    sessionStorage.setItem(`filter${item.getAttribute("name")}`, JSON.stringify(updateSelectItemListData))
                 }
                 else {
-                    localStorage.setItem(`filter${item.getAttribute("name")}`, JSON.stringify(selectItemListData))
+                    sessionStorage.setItem(`filter${item.getAttribute("name")}`, JSON.stringify(selectItemListData))
                 }
             })
             // get title data
@@ -65,10 +65,10 @@ const useGetF1Result = (filterData: any) => {
                 circuitInfo: htmlDoc.getElementsByClassName("circuit-info")[0]?.innerHTML,
             }
             const description = htmlDoc.getElementsByClassName("resultsarchive-content-header")[0].children[2];
-            localStorage.setItem(`heading`, JSON.stringify(heading))
+            sessionStorage.setItem(`heading`, JSON.stringify(heading))
             if (description) {
                 if(description.className != "sponser-wrapper")
-                localStorage.setItem(`description`, JSON.stringify(description.innerHTML))
+                sessionStorage.setItem(`description`, JSON.stringify(description.innerHTML))
             }
             //get table data
             const tableElement = htmlDoc.getElementsByClassName('resultsarchive-table');
@@ -96,7 +96,7 @@ const useGetF1Result = (filterData: any) => {
                             }
                             tableListAllRacesData.push(race)
                         })
-                        localStorage.setItem("tableData", JSON.stringify(tableListAllRacesData))
+                        sessionStorage.setItem("tableData", JSON.stringify(tableListAllRacesData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.racesEmpty)
                     }
                     //  Races Detail data
@@ -121,7 +121,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListDetailRaceData.push(race)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListDetailRaceData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListDetailRaceData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.raceResultEmpty)
 
                         }
@@ -144,7 +144,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListFastestLapData.push(lap)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListFastestLapData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListFastestLapData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.fastestLapsEmpty)
 
                         }
@@ -167,7 +167,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListPitStopSummaryData.push(pitStop)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListPitStopSummaryData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListPitStopSummaryData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.pitStopSummaryEmpty)
 
                         }
@@ -187,7 +187,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListStartingGridData.push(grid)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListStartingGridData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListStartingGridData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.startingGridEmpty)
 
                         }
@@ -210,7 +210,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListQualifyingData.push(qualify)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListQualifyingData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListQualifyingData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.qualifyingEmpty)
 
                         }
@@ -235,7 +235,7 @@ const useGetF1Result = (filterData: any) => {
                                 }
                                 tableListPracticeData.push(practice)
                             })
-                            localStorage.setItem("tableData", JSON.stringify(tableListPracticeData))
+                            sessionStorage.setItem("tableData", JSON.stringify(tableListPracticeData))
                             Helper.setTableColumnFromEmptyModel(EmptyObj.practiceEmpty)
 
                         }
@@ -262,7 +262,7 @@ const useGetF1Result = (filterData: any) => {
                             }
                             tableListDriversData.push(driver)
                         })
-                        localStorage.setItem("tableData", JSON.stringify(tableListDriversData))
+                        sessionStorage.setItem("tableData", JSON.stringify(tableListDriversData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.driversEmpty)
 
                     }
@@ -284,7 +284,7 @@ const useGetF1Result = (filterData: any) => {
                             }
                             tableListDriverDetailData.push(driver)
                         })
-                        localStorage.setItem("tableData", JSON.stringify(tableListDriverDetailData))
+                        sessionStorage.setItem("tableData", JSON.stringify(tableListDriverDetailData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.driverDetailEmpty)
 
                     }
@@ -303,7 +303,7 @@ const useGetF1Result = (filterData: any) => {
                             }
                             tableListTeamsData.push(team)
                         })
-                        localStorage.setItem("tableData", JSON.stringify(tableListTeamsData))
+                        sessionStorage.setItem("tableData", JSON.stringify(tableListTeamsData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.teamsEmpty)
                     }
                     else {
@@ -319,7 +319,7 @@ const useGetF1Result = (filterData: any) => {
                             }
                             tableListTeamDetailData.push(team)
                         })
-                        localStorage.setItem("tableData", JSON.stringify(tableListTeamDetailData))
+                        sessionStorage.setItem("tableData", JSON.stringify(tableListTeamDetailData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.teamDetailEmpty)
 
                     }
@@ -339,12 +339,12 @@ const useGetF1Result = (filterData: any) => {
                         }
                         tableListDHLFastestLapData.push(fastest)
                     })
-                    localStorage.setItem("tableData", JSON.stringify(tableListDHLFastestLapData))
+                    sessionStorage.setItem("tableData", JSON.stringify(tableListDHLFastestLapData))
                     Helper.setTableColumnFromEmptyModel(EmptyObj.DHLFastestLapAwardEmpty)
                 }
             }
             else {
-                localStorage.setItem("tableData", JSON.stringify([]))
+                sessionStorage.setItem("tableData", JSON.stringify([]))
             }
             return data;
         },

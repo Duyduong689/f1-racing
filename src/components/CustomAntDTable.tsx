@@ -5,14 +5,16 @@ interface CustomAntDTableProps {
   columns: any[];
   data: any[];
   handleChangeFilter: (value: any) => void;
+  loading: boolean;
 }
 const { Text, Link } = Typography;
 const CustomAntDTable: React.FC<CustomAntDTableProps> = ({
   columns,
   data,
   handleChangeFilter,
+  loading,
 }) => {
-  const updateColumns = columns.map((item) => {
+  let updateColumns = columns?.map((item) => {
     if (item.key == "grandPrix") {
       return {
         ...item,
@@ -39,15 +41,27 @@ const CustomAntDTable: React.FC<CustomAntDTableProps> = ({
         ...item,
         render: (value: any) => {
           return (
-            <Text
-              strong={value.url ? true : false}
-              style={{ cursor: "pointer" }}
+            <div
+              style={{ cursor: value.url ? "pointer" : "undefine" }}
               onClick={() =>
                 value.url
                   ? handleChangeFilter(Helper.subStringUrl(value?.url))
                   : undefined
               }
-            >{`${value.hideForTablet} ${value.hideForMobile} ${value.hideForDesktop}`}</Text>
+            >
+              <Text className="hideForTablet" strong={value.url ? true : false}>
+                {value.hideForTablet}
+              </Text>
+              <Text className="hideForMobile" strong={value.url ? true : false}>
+                {value.hideForMobile}
+              </Text>
+              <Text
+                className="hideForDesktop"
+                strong={value.url ? true : false}
+              >
+                {value.hideForDesktop}
+              </Text>
+            </div>
           );
         },
       };
@@ -75,19 +89,40 @@ const CustomAntDTable: React.FC<CustomAntDTableProps> = ({
     }
     return item;
   });
+
+  if (!Helper.isIterable(updateColumns)) {
+    updateColumns = [];
+  }
   let finalColumn = [...updateColumns];
-  const objectKeySpecial = "position";
-  const foundObject = updateColumns.find((obj) => obj.key == objectKeySpecial);
-  if (foundObject && Object.keys(foundObject).length > 0) {
+  const objectKeySpecial1 = "position";
+  const objectKeySpecial2 = "stops";
+  const foundObject1 = updateColumns.find(
+    (obj) => obj.key == objectKeySpecial1
+  );
+  const foundObject2 = updateColumns.find(
+    (obj) => obj.key == objectKeySpecial2
+  );
+
+  if (foundObject1 && Object.keys(foundObject1).length > 0) {
     const filteredData = updateColumns.filter(
-      (obj) => obj.key !== objectKeySpecial
+      (obj) => obj.key !== objectKeySpecial1
     );
     finalColumn = [
-      { title: "Position", key: "position", dataIndex: "position" },
+      { title: "Pos", key: "position", dataIndex: "position" },
       ...filteredData,
     ];
   }
-  const updateData = data.map((item, index) => {
+  if (foundObject2 && Object.keys(foundObject2).length > 0) {
+    const filteredData = updateColumns.filter(
+      (obj) => obj.key !== objectKeySpecial2
+    );
+    finalColumn = [
+      { title: "Stops", key: "stops", dataIndex: "stops" },
+      ...filteredData,
+    ];
+  }
+
+  const updateData = data?.map((item, index) => {
     return {
       ...item,
       key: index,
@@ -99,6 +134,7 @@ const CustomAntDTable: React.FC<CustomAntDTableProps> = ({
       size="large"
       columns={finalColumn}
       dataSource={updateData}
+      loading={loading}
     />
   );
 };

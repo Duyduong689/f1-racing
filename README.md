@@ -27,8 +27,9 @@ https://nodejs.org/en/blog/release/v18.16.0
 ```
 - ReactJS (Front-End) & Typescript
 - 
-## How to run the project on local (Follow the sequence)
-
+## How to run the project locally (Follow the sequence)
+*Note: Before running this application, please turn off your browser CORS to it works correctly. 
+Instructions will be do by this site: https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome
 ### Front-End 
 1. Go to frontend folder, then type **"npm i"** in the terminal to install all the necessary libraries
 2. Then type: **"npm start"** to run the Front-End

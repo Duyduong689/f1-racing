@@ -28,8 +28,18 @@ https://nodejs.org/en/blog/release/v18.16.0
 - ReactJS (Front-End) & Typescript
 - Libraries using: Axios, React-Query, Ant Design
 ## How to run the project locally (Follow the sequence)
-*Note: Before running this application, please turn off your browser CORS to it works correctly. 
-Instructions will be do by this site: https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome
+*Note: Before running this application, please turn off your browser CORS to it works correctly. By one of these methods: 
+1. Follow the instructions will be done by this site: https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome.
+2. Adding a proxy to bypass CORS (This will be limited on request call) by the following steps:
+- Open the frontend folder, navigate to ./src/utils/AxiosInstance.js file
+- In the AxiosInstance.js file change the code at line 2 from
+``` sh
+export const baseURL = "https://www.formula1.com/en/results/jcr:content/resultsarchive.html";
+```
+To
+``` sh
+export const baseURL = "https://api.allorigins.win/raw?url=https://www.formula1.com/en/results/jcr:content/resultsarchive.html";
+```
 ### Front-End 
 1. Go to the frontend folder, then type **"npm i"** in the terminal to install all the necessary libraries
 2. Then type: **"npm start"** to run the Front-End

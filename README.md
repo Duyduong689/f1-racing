@@ -26,17 +26,17 @@ npm install -g npm@9.5.1
 https://nodejs.org/en/blog/release/v18.16.0
 ```
 - ReactJS (Front-End) & Typescript
-- 
+- Libraries using: Axios, React-Query, Ant Design
 ## How to run the project locally (Follow the sequence)
 *Note: Before running this application, please turn off your browser CORS to it works correctly. 
 Instructions will be do by this site: https://stackoverflow.com/questions/3102819/disable-same-origin-policy-in-chrome
 ### Front-End 
-1. Go to frontend folder, then type **"npm i"** in the terminal to install all the necessary libraries
+1. Go to the frontend folder, then type **"npm i"** in the terminal to install all the necessary libraries
 2. Then type: **"npm start"** to run the Front-End
 3. The Frontend will start on http://localhost:3000
 
 ## Contribution
-Any information please contact us through these email: 
+For any information please contact us through these email: 
 ```sh
 duyduong365900.it@gmail.com
 ```

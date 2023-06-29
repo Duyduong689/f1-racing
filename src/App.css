@@ -93,3 +93,21 @@ a {
   align-items: center;
   justify-content: center;
 }
+.chart-wrap{
+  padding: 10px;
+  margin-bottom: 10px;
+  background: white;
+  border-radius: 5px;
+  position: relative;
+  .chart-title{
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 35px;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+  }
+}

@@ -124,3 +124,7 @@ export interface Heading {
     fullDate: string;
     circuitInfo : string;
 }
+export interface ChartData {
+    pos:number;
+    year:string;
+}

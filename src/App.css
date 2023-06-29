@@ -1,3 +1,4 @@
+
 .ant-pagination.ant-table-pagination.ant-table-pagination-right {
   background: white;
   width: fit-content;
@@ -23,12 +24,33 @@ a {
     margin-bottom: 20px;
   }
 }
-
+.hideForMobile ,.hideForTablet, .hideForTablet{
+  display: none;
+}
+@media (min-width: 768px) {
+  .hideForDesktop{
+    display: block;
+  }
+}
+@media (min-width: 1025px) {
+  .hideForMobile{
+    display: block;
+  }
+  .hideForDesktop{
+    display: none;
+  }
+}
+@media (min-width: 1225px) {
+  .hideForTablet{
+    display: block;
+  }
+}
 .logo {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px;
+  margin-top: 15px;
 }
 
 .filter-wrap {
@@ -62,4 +84,12 @@ a {
   font-size: 16px;
   margin-bottom: 20px;
   font-weight: 600;
+}
+.spinner{
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  background-color: rgb(0, 0, 0,0.1);
+  align-items: center;
+  justify-content: center;
 }

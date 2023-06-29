@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Space, Button, Table, Image } from "antd";
+import { Layout, Space, Spin } from "antd";
 import "./App.css";
 import { f1resultService } from "./services/f1result";
 import { Heading, SelectOption } from "./model/F1RacingModel";
@@ -32,10 +32,10 @@ function App() {
   const [description, setDescription] = useState("");
   const [tableColumns, setTableColumns] = useState([]);
   const [tableData, setTableData] = useState([]);
-  const { data, isLoading, refetch } =
+  const { data, isLoading, isFetching, refetch } =
     f1resultService.useGetF1Result(filterData);
   function getDataFromStorage(key: string) {
-    const storedData = localStorage.getItem(key);
+    const storedData = sessionStorage.getItem(key);
     let parsedData = [];
     if (storedData) {
       parsedData = JSON.parse(storedData);
@@ -96,6 +96,16 @@ function App() {
       });
     }
   };
+const descriptionFromStorage = () => {
+    try {
+      const storedElementHTML = JSON.parse(
+        sessionStorage.getItem("description") ?? ""
+      );
+      setDescription(storedElementHTML);
+    } catch (error) {
+        return null;
+    }
+};
   useEffect(() => {
     setFilterYear(getDataFromStorage("filteryear"));
     setFilterApiType(getDataFromStorage("filterapiType"));
@@ -105,17 +115,18 @@ function App() {
     setFilterResultType(getDataFromStorage("filterresultType"));
     setTableColumns(getDataFromStorage("tableColumns"));
     setTableData(getDataFromStorage("tableData"));
-    const storedElementHTML = JSON.parse(
-      localStorage.getItem("description") ?? ""
-    );
-    setDescription(storedElementHTML);
+    descriptionFromStorage();
     setHeading(getDataFromStorage("heading"));
   }, [data]);
   useEffect(() => {
     refetch();
   }, [filterData]);
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="spinner">
+        <Spin />
+      </div>
+    );
   }
   return (
     <Layout style={layoutStyle}>
@@ -213,6 +224,7 @@ function App() {
           columns={tableColumns}
           data={tableData}
           handleChangeFilter={handleTableChangeFilter}
+          loading={isFetching}
         />
       </Content>
       <Footer style={footerStyle}>

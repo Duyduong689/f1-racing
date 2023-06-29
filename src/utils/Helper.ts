@@ -27,7 +27,7 @@ function setTableColumnFromEmptyModel(obj: any) {
         key,
         dataIndex: key,
     }));
-    localStorage.setItem("tableColumns", JSON.stringify(extractedColumn))
+    sessionStorage.setItem("tableColumns", JSON.stringify(extractedColumn))
     return extractedColumn
 
 }
@@ -55,6 +55,12 @@ function convertToRealSponserImageUrl(input: string): string {
     }
     return ""
 }
+function isIterable(obj: any) {
+    if (obj == null) {
+        return false;
+    }
+    return typeof obj[Symbol.iterator] === 'function';
+}
 export const Helper = {
     removeNewlinesAndTrim,
     replaceSuffixSecond,
@@ -63,5 +69,6 @@ export const Helper = {
     setTableColumnFromEmptyModel,
     subStringUrl,
     customHeadingTrim,
-    convertToRealSponserImageUrl
+    convertToRealSponserImageUrl,
+    isIterable
 }

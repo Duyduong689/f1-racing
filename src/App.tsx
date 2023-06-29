@@ -11,6 +11,7 @@ import {
   footerStyle,
   layoutStyle,
 } from "./AppStyle";
+import CustomAntDColumnChart from "./components/CustomAntDColumnChart";
 const { Header, Footer, Content } = Layout;
 
 function App() {
@@ -32,6 +33,8 @@ function App() {
   const [description, setDescription] = useState("");
   const [tableColumns, setTableColumns] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [chartData, setChartData] = useState([]);
+
   const { data, isLoading, isFetching, refetch } =
     f1resultService.useGetF1Result(filterData);
   function getDataFromStorage(key: string) {
@@ -96,16 +99,16 @@ function App() {
       });
     }
   };
-const descriptionFromStorage = () => {
+  const descriptionFromStorage = () => {
     try {
       const storedElementHTML = JSON.parse(
         sessionStorage.getItem("description") ?? ""
       );
       setDescription(storedElementHTML);
     } catch (error) {
-        return null;
+      return null;
     }
-};
+  };
   useEffect(() => {
     setFilterYear(getDataFromStorage("filteryear"));
     setFilterApiType(getDataFromStorage("filterapiType"));
@@ -117,6 +120,7 @@ const descriptionFromStorage = () => {
     setTableData(getDataFromStorage("tableData"));
     descriptionFromStorage();
     setHeading(getDataFromStorage("heading"));
+    setChartData(getDataFromStorage("tableDataChart"));
   }, [data]);
   useEffect(() => {
     refetch();
@@ -220,6 +224,7 @@ const descriptionFromStorage = () => {
             dangerouslySetInnerHTML={{ __html: description }}
           ></div>
         )}
+        {chartData && chartData.length > 0 && <CustomAntDColumnChart chartData={chartData} />}
         <CustomAntDTable
           columns={tableColumns}
           data={tableData}

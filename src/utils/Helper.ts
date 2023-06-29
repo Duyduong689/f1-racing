@@ -1,3 +1,5 @@
+import { ChartData, Drivers, TeamDetail, Teams } from "../model/F1RacingModel";
+
 function removeNewlinesAndTrim(input: string): string {
     const withoutNewlines = input.replace(/\n/g, '');
     const trimmed = withoutNewlines.trim();
@@ -61,6 +63,35 @@ function isIterable(obj: any) {
     }
     return typeof obj[Symbol.iterator] === 'function';
 }
+function getDriverName(input: string): string {
+    const parts = input.split("/");
+    const lastName = parts[1].substring(parts[1].lastIndexOf("-") + 1);
+    return lastName;
+}
+function getTeamName(input: string): string {
+    const parts = input.split("/");
+    const teamName = parts[parts.length - 1].split(".")[0];
+    return teamName;
+}
+function compareTeamName(a: string, b: string): boolean {
+    if (a.toLowerCase().includes("red_bull") && b.toLowerCase().includes("red_bull")) {
+        return true;
+    }
+    else {
+        return a == b;
+    }
+}
+function convertToChartDataFor(array: any[], year: string) {
+    let resultArray: ChartData[] = []
+    array.map((item) => {
+        let chartData: ChartData = {
+            pos: parseInt(item.position),
+            year: year.toString()
+        }
+        resultArray.push(chartData)
+    })
+    return resultArray
+}
 export const Helper = {
     removeNewlinesAndTrim,
     replaceSuffixSecond,
@@ -70,5 +101,9 @@ export const Helper = {
     subStringUrl,
     customHeadingTrim,
     convertToRealSponserImageUrl,
-    isIterable
+    isIterable,
+    getDriverName,
+    getTeamName,
+    compareTeamName,
+    convertToChartDataFor
 }

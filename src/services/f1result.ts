@@ -16,6 +16,106 @@ const getF1Result = async (filterData: any) => {
     );
     return response.data;
 };
+const getDriverChartData = async (filterData: any) => {
+    const { year, apiType, driverRef, teamKey } = filterData;
+    let yearFilter = year ?? '2023'
+    let apiTypeFilter = ""
+    const parser = new DOMParser();
+    if (driverRef !== "") {
+        apiTypeFilter = "drivers";
+        const driverLastName = Helper.getDriverName(driverRef)
+        for (let i = 0; i < 5; i++) {
+            const response = await axiosBase.get(
+                `${baseURL}/${yearFilter}/${apiTypeFilter}.html`
+            );
+            const htmlDoc = parser.parseFromString(response.data, 'text/html');
+            const tableElement = htmlDoc.getElementsByClassName('resultsarchive-table');
+            if (tableElement.length > 0) {
+                const tableListRowElement = tableElement[0].getElementsByTagName("tbody")[0].children
+                const tableListDriversData: Drivers[] = [];
+                Array.from(tableListRowElement).map((tr) => {
+                    if (tr.children[2].children[0].children[1].innerHTML.toLocaleLowerCase() === driverLastName) {
+                        let driver: Drivers = {
+                            position: tr.children[1].innerHTML,
+                            driver: {
+                                url: tr.children[2].getElementsByTagName('a')[0].getAttribute("href"),
+                                hideForTablet: tr.children[2].children[0].children[0].innerHTML,
+                                hideForMobile: tr.children[2].children[0].children[1].innerHTML,
+                                hideForDesktop: tr.children[2].children[0].children[2].innerHTML,
+                            },
+                            nationality: tr.children[3].innerHTML,
+                            car: {
+                                url: tr.children[4].children[0].getAttribute("href"),
+                                text: tr.children[4].children[0].innerHTML,
+                            },
+                            points: tr.children[5].innerHTML,
+                        }
+                        tableListDriversData.push(driver)
+                    }
+                })
+                let getDataFromStorage = sessionStorage.getItem("tableDataChart")
+                if (getDataFromStorage) {
+                    let tableDataChart = JSON.parse(sessionStorage.getItem("tableDataChart") ?? '')
+
+                    let convertToChartArray = Helper.convertToChartDataFor(tableListDriversData, yearFilter)
+
+                    tableDataChart = [...tableDataChart, ...convertToChartArray]
+                    sessionStorage.setItem("tableDataChart", JSON.stringify(tableDataChart))
+                }
+                else {
+                    let convertToChartArray = Helper.convertToChartDataFor(tableListDriversData, yearFilter)
+
+                    sessionStorage.setItem("tableDataChart", JSON.stringify(convertToChartArray))
+                }
+                // Helper.setTableColumnFromEmptyModel(EmptyObj.driversEmpty)
+            }
+            yearFilter--;
+        }
+    }
+    else if (teamKey != "") {
+        apiTypeFilter = "team";
+        for (let i = 0; i < 5; i++) {
+            const response = await axiosBase.get(
+                `${baseURL}/${yearFilter}/${apiTypeFilter}.html`
+            );
+            const htmlDoc = parser.parseFromString(response.data, 'text/html');
+            const tableElement = htmlDoc.getElementsByClassName('resultsarchive-table');
+            if (tableElement.length > 0) {
+                const tableListRowElement = tableElement[0].getElementsByTagName("tbody")[0].children
+                const tableListTeamsData: Teams[] = [];
+                Array.from(tableListRowElement).map((tr) => {
+                    if (Helper.compareTeamName(teamKey, Helper.getTeamName(tr.children[2].children[0].getAttribute('href') ?? ''))) {
+                        let team: Teams = {
+                            position: tr.children[1].innerHTML,
+                            team: {
+                                url: tr.children[2].children[0].getAttribute('href'),
+                                text: tr.children[2].children[0].innerHTML
+                            },
+                            points: tr.children[3].innerHTML,
+                        }
+                        tableListTeamsData.push(team)
+                    }
+                })
+                let getDataFromStorage = sessionStorage.getItem("tableDataChart")
+                if (getDataFromStorage) {
+                    let tableDataChart = JSON.parse(sessionStorage.getItem("tableDataChart") ?? '')
+                    let convertToChartArray = Helper.convertToChartDataFor(tableListTeamsData, yearFilter)
+
+                    tableDataChart = [...tableDataChart, ...convertToChartArray]
+                    sessionStorage.setItem("tableDataChart", JSON.stringify(tableDataChart))
+                }
+                else {
+
+                    let convertToChartArray = Helper.convertToChartDataFor(tableListTeamsData, yearFilter)
+                    sessionStorage.setItem("tableDataChart", JSON.stringify(convertToChartArray))
+                }
+            }
+            yearFilter--;
+        }
+    }
+
+    //return response.data;
+};
 const useGetF1Result = (filterData: any) => {
     const { year, apiType, meeting, driverRef, teamKey, resultType } = filterData;
     return useQuery({
@@ -32,6 +132,7 @@ const useGetF1Result = (filterData: any) => {
             sessionStorage.setItem(`filtermeetingKey`, JSON.stringify([]))
             sessionStorage.setItem(`heading`, JSON.stringify(""))
             sessionStorage.setItem(`description`, JSON.stringify(""))
+            sessionStorage.setItem(`tableDataChart`, JSON.stringify([]))
 
             Array.from(selectionFiltersElement).map(item => {
                 let selectItemListData: SelectOption[] = [];
@@ -58,8 +159,8 @@ const useGetF1Result = (filterData: any) => {
             const titleHeadingElement = htmlDoc.getElementsByClassName("ResultsArchiveTitle")
             const sponserImageUrl = htmlDoc.getElementsByClassName("race-header-sponsor")[0]?.children[0]?.children[0]?.getAttribute('src')
             const heading: Heading = {
-                heading:Helper.customHeadingTrim(titleHeadingElement[0].textContent ?? '', year),
-                sponserImageUrl:Helper.convertToRealSponserImageUrl(sponserImageUrl ?? ''),
+                heading: Helper.customHeadingTrim(titleHeadingElement[0].textContent ?? '', year),
+                sponserImageUrl: Helper.convertToRealSponserImageUrl(sponserImageUrl ?? ''),
                 startDate: htmlDoc.getElementsByClassName("start-date")[0]?.innerHTML,
                 fullDate: htmlDoc.getElementsByClassName("full-date")[0]?.innerHTML,
                 circuitInfo: htmlDoc.getElementsByClassName("circuit-info")[0]?.innerHTML,
@@ -67,8 +168,8 @@ const useGetF1Result = (filterData: any) => {
             const description = htmlDoc.getElementsByClassName("resultsarchive-content-header")[0].children[2];
             sessionStorage.setItem(`heading`, JSON.stringify(heading))
             if (description) {
-                if(description.className != "sponser-wrapper")
-                sessionStorage.setItem(`description`, JSON.stringify(description.innerHTML))
+                if (description.className != "sponser-wrapper")
+                    sessionStorage.setItem(`description`, JSON.stringify(description.innerHTML))
             }
             //get table data
             const tableElement = htmlDoc.getElementsByClassName('resultsarchive-table');
@@ -286,7 +387,7 @@ const useGetF1Result = (filterData: any) => {
                         })
                         sessionStorage.setItem("tableData", JSON.stringify(tableListDriverDetailData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.driverDetailEmpty)
-
+                        await getDriverChartData(filterData);
                     }
                 }
                 else if (apiType == "team") {
@@ -321,7 +422,7 @@ const useGetF1Result = (filterData: any) => {
                         })
                         sessionStorage.setItem("tableData", JSON.stringify(tableListTeamDetailData))
                         Helper.setTableColumnFromEmptyModel(EmptyObj.teamDetailEmpty)
-
+                        await getDriverChartData(filterData);
                     }
                 }
                 else if (apiType == "fastest-laps") {
